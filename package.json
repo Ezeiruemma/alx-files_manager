@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "description": "",
     "main": "index.js",
-    "type": "module",
-  "scripts": {
+     "scripts": {
     "lint": "./node_modules/.bin/eslint",
     "check-lint": "lint [0-9]*.js",
     "start-server": "nodemon --exec babel-node --presets @babel/preset-env ./server.js",
