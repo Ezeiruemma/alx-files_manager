@@ -12,6 +12,12 @@ export const handleAuthorization = async (req, res, next) => {
   }
 
   const authToken = authorization.split(' ')[1];
+
+  if (authorization.split(' ')[0] !== 'Basic') {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+
   const decrypted = Buffer.from(authToken, 'base64').toString();
   const email = decrypted.split(':')[0];
   const password = decrypted.split(':')[1];
