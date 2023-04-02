@@ -23,6 +23,10 @@ class DBClient {
   nbFiles() {
     return this.client.db().collection('files').countDocuments();
   }
+
+  useCollection(coll) {
+    return this.client.db().collection(coll);
+  }
 }
 
 const dbClient = new DBClient();

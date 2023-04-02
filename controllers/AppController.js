@@ -16,7 +16,7 @@ class AppController {
     try {
       res
         .status(200)
-        .send(JSON.stringify({ user: await dbClient.nbUsers(), files: await dbClient.nbFiles() }));
+        .send(JSON.stringify({ users: await dbClient.nbUsers(), files: await dbClient.nbFiles() }));
     } catch (err) {
       res.status(400).send('server error');
     }
