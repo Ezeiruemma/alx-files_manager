@@ -13,16 +13,15 @@ class DBClient {
   }
 
   isAlive() {
-    // return this.client.isConnected();
     return this.db.connected;
   }
 
   nbUsers() {
-    this.client.db().collection('users').countDocuments();
+    return this.client.db().collection('users').countDocuments();
   }
 
   nbFiles() {
-    this.client.db().collection('files').countDocuments();
+    return this.client.db().collection('files').countDocuments();
   }
 }
 
