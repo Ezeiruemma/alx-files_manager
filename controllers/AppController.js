@@ -6,7 +6,7 @@ class AppController {
     try {
       res
         .status(200)
-        .send(JSON.stringify({ redis: redisClient.isAlive(), db: dbClient.isAlive() }));
+        .json({ redis: redisClient.isAlive(), db: dbClient.isAlive() });
     } catch (err) {
       res.status(400).send(`server error ${err}`);
     }
@@ -16,7 +16,7 @@ class AppController {
     try {
       res
         .status(200)
-        .send(JSON.stringify({ users: await dbClient.nbUsers(), files: await dbClient.nbFiles() }));
+        .json({ users: await dbClient.nbUsers(), files: await dbClient.nbFiles() });
     } catch (err) {
       res.status(400).send('server error');
     }
