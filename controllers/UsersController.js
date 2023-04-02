@@ -25,6 +25,12 @@ class UsersController {
 
     res.status(201).json({ email, id });
   }
+
+  static async getMe(req, res) {
+    const { user } = req;
+
+    res.status(200).json({ email: user.email, id: user._id });
+  }
 }
 
 export default UsersController;
