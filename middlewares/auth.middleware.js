@@ -40,7 +40,7 @@ export const handleXToken = async (req, res, next) => {
     return;
   }
 
-  const id = await redisClient.get(xToken);
+  const id = await redisClient.get(`auth_${xToken}`);
 
   if (!id) {
     res.status(401).json({ error: 'Unauthorized' });

@@ -6,14 +6,14 @@ class AuthController {
     const { user } = req;
     const token = v4();
 
-    await redisClient.set(token, user._id.toString(), 86400);
+    await redisClient.set(`auth_${token}`, user._id.toString(), 86400);
     res.status(200).json({ token });
   }
 
   static async getDisconnect(req, res) {
     const xToken = req.headers['x-token'];
 
-    await redisClient.del(xToken);
+    await redisClient.del(`auth_${xToken}`);
     res.status(204).send();
   }
 }
