@@ -26,7 +26,7 @@ class FilesController {
       return;
     }
     if (parentId && parentId !== 0) {
-      const file = await dbClient.useCollection('files').findOne(parentId);
+      const file = await dbClient.useCollection('files').findOne({ parentId });
 
       if (!file) {
         res.status(400).json({ error: 'Parent not found' });
