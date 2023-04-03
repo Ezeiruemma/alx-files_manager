@@ -134,8 +134,8 @@ class FilesController {
 
     await dbClient.useCollection('files').updateOne(
       { _id: objectId, userId: objectUserId },
-      { $set: { isPublic: true } }, 
-    )
+      { $set: { isPublic: true } },
+    );
 
     const { _id, isPublic, ...newFile } = await file;
     res.status(200).json({ id: _id, isPublic: true, ...newFile });
