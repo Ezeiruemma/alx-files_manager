@@ -27,7 +27,9 @@ class FilesController {
       return;
     }
     if (parentId && parentId !== 0) {
-      const file = await dbClient.useCollection('files').findOne({ parentId });
+      const file = await dbClient.useCollection('files').findOne(
+        { _id: new mongoDBCore.BSON.ObjectId(parentId) },
+      );
 
       if (!file) {
         res.status(400).json({ error: 'Parent not found' });
@@ -81,8 +83,8 @@ class FilesController {
       res.status(404).json({ error: 'Not found' });
       return;
     }
-
-    res.status(200).json(file);
+    const { _id, ...newFile } = file;
+    res.status(201).json({ id: _id, ...newFile });
   }
 
   static async getIndex(req, res) {
