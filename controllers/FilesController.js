@@ -119,6 +119,48 @@ class FilesController {
 
     res.status(200).json(file);
   }
+
+  static async putPublish(req, res) {
+    const { _id: userId } = req.user;
+    const { id } = req.params;
+    const objectId = new mongoDBCore.BSON.ObjectId(id);
+    const objectUserId = new mongoDBCore.BSON.ObjectId(userId);
+    const file = await dbClient.useCollection('files').findOne({ _id: objectId, userId: objectUserId });
+
+    if (!file) {
+      res.status(404).json({ error: 'Not found' });
+      return;
+    }
+
+    await dbClient.useCollection('files').updateOne(
+      { _id: objectId, userId: objectUserId },
+      { $set: { isPublic: true } }, 
+    )
+
+    const { _id, isPublic, ...newFile } = await file;
+    res.status(200).json({ id: _id, isPublic: true, ...newFile });
+  }
+
+  static async putUnpublish(req, res) {
+    const { _id: userId } = req.user;
+    const { id } = req.params;
+    const objectId = new mongoDBCore.BSON.ObjectId(id);
+    const objectUserId = new mongoDBCore.BSON.ObjectId(userId);
+    const file = await dbClient.useCollection('files').findOne({ _id: objectId, userId: objectUserId });
+
+    if (!file) {
+      res.status(404).json({ error: 'Not found' });
+      return;
+    }
+
+    await dbClient.useCollection('files').updateOne(
+      { _id: objectId, userId: objectUserId },
+      { $set: { isPublic: false } },
+    );
+
+    const { _id, isPublic, ...newFile } = await file;
+    res.status(200).json({ id: _id, isPublic: false, ...newFile });
+  }
 }
 
 export default FilesController;
