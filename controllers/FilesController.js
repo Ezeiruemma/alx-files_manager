@@ -1,3 +1,4 @@
+import mongoDBCore from 'mongodb/lib/core';
 import dbClient from '../utils/db';
 import saveFile from '../utils/saveFile';
 
@@ -67,6 +68,54 @@ class FilesController {
         })
         .catch((err) => console.log(err));
     }
+  }
+
+  static async getShow(req, res) {
+    const { _id: userId } = req.user;
+    const { id } = req.params;
+    const objectId = new mongoDBCore.BSON.ObjectId(id);
+    const objectUserId = new mongoDBCore.BSON.ObjectId(userId);
+    const file = await dbClient.useCollection('files').findOne({ _id: objectId, userId: objectUserId });
+
+    if (!file) {
+      res.status(404).json({ error: 'Not found' });
+      return;
+    }
+
+    res.status(200).json(file);
+  }
+
+  static async getIndex(req, res) {
+    const { _id: userId } = req.user;
+    const { parentId = 0 } = req.query;
+    const page = Number.parseInt(req.query.page, 10) || 0;
+    const objectUserId = new mongoDBCore.BSON.ObjectId(userId);
+    const file = await dbClient.useCollection('files')
+      .aggregate([
+        { $match: { parentId, userId: objectUserId } },
+        { $sort: { _id: -1 } },
+        { $skip: page * 20 },
+        { $limit: 20 },
+        {
+          $project: {
+            _id: 0,
+            id: '$_id',
+            userId: '$userId',
+            name: '$name',
+            type: '$type',
+            isPublic: '$isPublic',
+            parentId: {
+              $cond: { if: { $eq: ['$parentId', '0'] }, then: 0, else: '$parentId' },
+            },
+          },
+        },
+      ]).toArray();
+    if (!file) {
+      res.status(404).json({ error: 'Not found' });
+      return;
+    }
+
+    res.status(200).json(file);
   }
 }
 

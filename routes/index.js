@@ -14,6 +14,8 @@ indexRoute
   .get('/connect', handleAuthorization, AuthController.getConnect)
   .get('/disconnect', AuthController.getDisconnect)
   .get('/users/me', handleXToken, UsersController.getMe)
-  .post('/files', handleXToken, FilesController.postUpload);
+  .post('/files', handleXToken, FilesController.postUpload)
+  .get('/files/:id', handleXToken, FilesController.getShow)
+  .get('/files', handleXToken, FilesController.getIndex);
 
 export default indexRoute;
