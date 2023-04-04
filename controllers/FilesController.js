@@ -144,7 +144,7 @@ class FilesController {
       _id,
       isPublic,
       localPath = null,
-      ...newFile,
+      ...newFile
     } = await file;
     res.status(200).json({ id: _id, isPublic: true, ...newFile });
   }
@@ -170,7 +170,7 @@ class FilesController {
       _id,
       isPublic,
       localPath = null,
-      ...newFile,
+      ...newFile
     } = await file;
     res.status(200).json({ id: _id, isPublic: false, ...newFile });
   }
