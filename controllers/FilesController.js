@@ -140,7 +140,12 @@ class FilesController {
       { $set: { isPublic: true } },
     );
 
-    const { _id, isPublic, localPath = null, ...newFile } = await file;
+    const {
+      _id,
+      isPublic,
+      localPath = null,
+      ...newFile,
+    } = await file;
     res.status(200).json({ id: _id, isPublic: true, ...newFile });
   }
 
@@ -161,49 +166,57 @@ class FilesController {
       { $set: { isPublic: false } },
     );
 
-    const { _id, isPublic, localPath = null, ...newFile } = await file;
+    const {
+      _id,
+      isPublic,
+      localPath = null,
+      ...newFile,
+    } = await file;
     res.status(200).json({ id: _id, isPublic: false, ...newFile });
   }
 
-    static async getFile(req, res) {
-	const { id } = req.params;
-	const { _id: tokenId } = await xToken(req);
+  static async getFile(req, res) {
+    const { id } = req.params;
+    const { _id: tokenId } = await xToken(req);
+    const file = await dbClient.useCollection('files').findOne({ _id: new mongoDBCore.BSON.ObjectId(id) });
 
-	const file = await dbClient.useCollection('files').findOne({ _id: new mongoDBCore.BSON.ObjectId(id) })
-
-	if (!file) {
-	    res.status(404).json({ error: 'Not found' });
-	    return
-	}
-
-	const { isPublic, userId, name, type, localPath = null } = file;
-	console.log(tokenId, userId, isPublic)
-	if (!isPublic && userId !== tokenId) {
-	    res.status(404).json({ error: 'Not found pub' });
-	    return
-	}
-
-	if (type === 'folder') {
-	    res.status(400).json({ error: 'A folder doesn\'t have content' });
-	    return;
-	}
-
-	if (type === 'file') {
-	    access(localPath, (err) => {
-		if (err) {
-		    if (err.code === 'ENONET') {
-			res.status(404).json({ error: 'Not found fs' });
-			return;
-		    }
-		    return;
-		}
-	    });
-	    return;
-	}
-
-	ress.setHeader('Content-Type', ContentType(name) || 'text/plain; charset=utf-8')
-	    .status(200).sendFile(localPath);
+    if (!file) {
+      res.status(404).json({ error: 'Not found' });
+      return;
     }
+
+    const {
+      isPublic,
+      userId,
+      name,
+      type,
+      localPath = null,
+    } = file;
+    console.log(tokenId, userId, isPublic);
+    if (!isPublic && (userId !== tokenId)) {
+      res.status(404).json({ error: 'Not found pub' });
+      return;
+    }
+
+    if (type === 'folder') {
+      res.status(400).json({ error: 'A folder doesn\'t have content' });
+      return;
+    }
+
+    if (type === 'file') {
+      access(localPath, (err) => {
+        if (err) {
+          if (err.code === 'ENONET') {
+            res.status(404).json({ error: 'Not found' });
+            return;
+          }
+        }
+      });
+    }
+
+    res.setHeader('Content-Type', contentType(name) || 'text/plain; charset=utf-8')
+      .status(200).sendFile(localPath);
+  }
 }
 
 export default FilesController;
