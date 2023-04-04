@@ -17,6 +17,7 @@ indexRoute
   .post('/files', handleXToken, FilesController.postUpload)
   .get('/files/:id', handleXToken, FilesController.getShow)
   .get('/files', handleXToken, FilesController.getIndex)
+  .get('/files/:id/data', FilesController.getFile)
   .put('/files/:id/publish', handleXToken, FilesController.putPublish)
   .put('/files/:id/unpublish', handleXToken, FilesController.putUnpublish);
 
