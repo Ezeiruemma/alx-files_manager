@@ -143,9 +143,9 @@ class FilesController {
     const {
       _id,
       isPublic,
-      localPath = null,
       ...newFile
     } = await file;
+
     res.status(200).json({ id: _id, isPublic: true, ...newFile });
   }
 
@@ -169,9 +169,9 @@ class FilesController {
     const {
       _id,
       isPublic,
-      localPath = null,
       ...newFile
     } = await file;
+
     res.status(200).json({ id: _id, isPublic: false, ...newFile });
   }
 
@@ -192,8 +192,8 @@ class FilesController {
       type,
       localPath = null,
     } = file;
-    console.log(tokenId, userId, isPublic);
-    if (!isPublic && (userId !== tokenId)) {
+
+    if ((!isPublic) && (userId.toString() !== tokenId.toString())) {
       res.status(404).json({ error: 'Not found pub' });
       return;
     }
@@ -208,14 +208,13 @@ class FilesController {
         if (err) {
           if (err.code === 'ENONET') {
             res.status(404).json({ error: 'Not found' });
-            return;
           }
         }
       });
     }
 
-    res.setHeader('Content-Type', contentType(name) || 'text/plain; charset=utf-8')
-      .status(200).sendFile(localPath);
+    res.setHeader('Content-Type', contentType(name) || 'text/plain; charset=utf-8');
+    res.status(200).sendFile(localPath);
   }
 }
 
