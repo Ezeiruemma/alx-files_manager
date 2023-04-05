@@ -92,7 +92,10 @@ class FilesController {
 
   static async getIndex(req, res) {
     const { _id: userId } = req.user;
-    const { parentId = 0 } = req.query;
+    let { parentId = 0 } = req.query;
+    parentId = parentId.toString() === '0'
+      ? parentId
+      : new mongoDBCore.BSON.ObjectId(parentId);
     const page = Number.parseInt(req.query.page, 10) || 0;
     const objectUserId = new mongoDBCore.BSON.ObjectId(userId);
     const file = await dbClient.useCollection('files')
@@ -177,7 +180,8 @@ class FilesController {
 
   static async getFile(req, res) {
     const { id } = req.params;
-    const { _id: tokenId } = await xToken(req);
+    const user = await xToken(req);
+    const tokenId = user ? user._id : '';
     const file = await dbClient.useCollection('files').findOne({ _id: new mongoDBCore.BSON.ObjectId(id) });
 
     if (!file) {
@@ -194,7 +198,7 @@ class FilesController {
     } = file;
 
     if ((!isPublic) && (userId.toString() !== tokenId.toString())) {
-      res.status(404).json({ error: 'Not found pub' });
+      res.status(404).json({ error: 'Not found' });
       return;
     }
 
