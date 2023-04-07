@@ -93,13 +93,11 @@ class FilesController {
   static async getIndex(req, res) {
     const { _id: userId } = req.user;
     let { parentId } = req.query;
-    parentId = parentId.toString() === '0'
-      ? parentId
-      : new mongoDBCore.BSON.ObjectId(parentId);
     const page = Number.parseInt(req.query.page, 10) || 0;
     const objectUserId = new mongoDBCore.BSON.ObjectId(userId);
     let file;
     if (parentId) {
+      parentId = new mongoDBCore.BSON.ObjectId(parentId);
       file = await dbClient.useCollection('files')
         .aggregate([
           { $match: { parentId, userId: objectUserId } },
