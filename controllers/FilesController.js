@@ -98,49 +98,50 @@ class FilesController {
       : new mongoDBCore.BSON.ObjectId(parentId);
     const page = Number.parseInt(req.query.page, 10) || 0;
     const objectUserId = new mongoDBCore.BSON.ObjectId(userId);
+    let file;
     if (parentId) {
-      const file = await dbClient.useCollection('files')
-      .aggregate([
-        { $match: { parentId, userId: objectUserId } },
-        { $sort: { _id: -1 } },
-        { $skip: page * 20 },
-        { $limit: 20 },
-        {
-          $project: {
-            _id: 0,
-            id: '$_id',
-            userId: '$userId',
-            name: '$name',
-            type: '$type',
-            isPublic: '$isPublic',
-            parentId: {
-              $cond: { if: { $eq: ['$parentId', '0'] }, then: 0, else: '$parentId' },
+      file = await dbClient.useCollection('files')
+        .aggregate([
+          { $match: { parentId, userId: objectUserId } },
+          { $sort: { _id: -1 } },
+          { $skip: page * 20 },
+          { $limit: 20 },
+          {
+            $project: {
+              _id: 0,
+              id: '$_id',
+              userId: '$userId',
+              name: '$name',
+              type: '$type',
+              isPublic: '$isPublic',
+              parentId: {
+                $cond: { if: { $eq: ['$parentId', '0'] }, then: 0, else: '$parentId' },
+              },
             },
           },
-        },
-      ]).toArray();
+        ]).toArray();
     }
     if (!parentId) {
-      const file = await dbClient.useCollection('files')
-      .aggregate([
-        { $match: { userId: objectUserId } },
-        { $sort: { _id: -1 } },
-        { $skip: page * 20 },
-        { $limit: 20 },
-        {
-          $project: {
-            _id: 0,
-            id: '$_id',
-            userId: '$userId',
-            name: '$name',
-            type: '$type',
-            isPublic: '$isPublic',
-            parentId: {
-              $cond: { if: { $eq: ['$parentId', '0'] }, then: 0, else: '$parentId' },
+      file = await dbClient.useCollection('files')
+        .aggregate([
+          { $match: { userId: objectUserId } },
+          { $sort: { _id: -1 } },
+          { $skip: page * 20 },
+          { $limit: 20 },
+          {
+            $project: {
+              _id: 0,
+              id: '$_id',
+              userId: '$userId',
+              name: '$name',
+              type: '$type',
+              isPublic: '$isPublic',
+              parentId: {
+                $cond: { if: { $eq: ['$parentId', '0'] }, then: 0, else: '$parentId' },
+              },
             },
           },
-        },
-      ]).toArray();
+        ]).toArray();
     }
     if (!file) {
       res.status(404).json({ error: 'Not found' });
