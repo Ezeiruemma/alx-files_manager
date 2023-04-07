@@ -76,18 +76,29 @@ class FilesController {
   }
 
   static async getShow(req, res) {
-    const { _id: userId } = req.user;
+    const { _id: userIdReq } = req.user;
     const { id } = req.params;
     const objectId = new mongoDBCore.BSON.ObjectId(id);
-    const objectUserId = new mongoDBCore.BSON.ObjectId(userId);
+    const objectUserId = new mongoDBCore.BSON.ObjectId(userIdReq);
     const file = await dbClient.useCollection('files').findOne({ _id: objectId, userId: objectUserId });
 
     if (!file) {
       res.status(404).json({ error: 'Not found' });
       return;
     }
-    const { _id, ...newFile } = file;
-    res.status(201).json({ id: _id, ...newFile });
+    const {
+      _id,
+      userId,
+      parentId,
+      ...newFile
+    } = file;
+
+    res.status(201).json({
+      id: _id.toString(),
+      userId: userIdReq.toString(),
+      parentId: parentId.toString(),
+      ...newFile
+    });
   }
 
   static async getIndex(req, res) {
