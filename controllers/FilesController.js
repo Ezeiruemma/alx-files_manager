@@ -104,16 +104,13 @@ class FilesController {
   static async getIndex(req, res) {
     const { _id: userId } = req.user;
     let { parentId } = req.query;
-    const page = /\d+/.test((req.query.page || '').toString())
-      ? Number.parseInt(req.query.page, 10)
-      : 0;
-    const objectUserId = new mongoDBCore.BSON.ObjectId(userId);
+    const page = req.query.page || 0;
     let file;
     if (parentId) {
       parentId = new mongoDBCore.BSON.ObjectId(parentId);
       file = await dbClient.useCollection('files')
         .aggregate([
-          { $match: { parentId, userId: objectUserId } },
+          { $match: { parentId, userId } },
           { $sort: { _id: -1 } },
           { $skip: page * 20 },
           { $limit: 20 },
@@ -135,7 +132,7 @@ class FilesController {
     if (!parentId) {
       file = await dbClient.useCollection('files')
         .aggregate([
-          { $match: { userId: objectUserId } },
+          { $match: { userId } },
           { $sort: { _id: -1 } },
           { $skip: page * 20 },
           { $limit: 20 },
@@ -246,15 +243,18 @@ class FilesController {
     if (type === 'file') {
       access(localPath, (err) => {
         if (err) {
-          if (err.code === 'ENONET') {
+          if (err.code === 'ENOENT') {
             res.status(404).json({ error: 'Not found' });
+            return;
           }
         }
+        res.setHeader('Content-Type', contentType(name) || 'text/plain; charset=utf-8');
+        res.status(200).sendFile(localPath);
       });
     }
 
-    res.setHeader('Content-Type', contentType(name) || 'text/plain; charset=utf-8');
-    res.status(200).sendFile(localPath);
+    // res.setHeader('Content-Type', contentType(name) || 'text/plain; charset=utf-8');
+    // res.status(200).sendFile(localPath);
   }
 }
 
