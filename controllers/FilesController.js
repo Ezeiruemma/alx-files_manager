@@ -93,7 +93,7 @@ class FilesController {
       ...newFile
     } = file;
 
-    res.status(201).json({
+    res.status(200).json({
       id: _id.toString(),
       userId: userIdReq.toString(),
       parentId: parentId.toString(),
@@ -104,8 +104,8 @@ class FilesController {
   static async getIndex(req, res) {
     const { _id: userId } = req.user;
     let { parentId } = req.query;
-    const page = /\d+/.test((req.query.page || '').toString()) 
-      ? Number.parseInt(req.query.page, 10) 
+    const page = /\d+/.test((req.query.page || '').toString())
+      ? Number.parseInt(req.query.page, 10)
       : 0;
     const objectUserId = new mongoDBCore.BSON.ObjectId(userId);
     let file;
